@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Official Dana | AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --accent1:#ff3d5a;
+      --accent2:#7a2eff;
+      --stripe-a:#7a2eff; --stripe-b:#ff3d5a; --stripe-c:#ff72cc; --stripe-d:#ffa43e;
+      --text-on-dark:#eef3ff; --muted-on-dark:#cfd7eb;
+      --symbol-size:64px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:#000; color:#e9eefc;
+      font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+      overflow:hidden;
+    }
+
+    /* ===== LOADER ===== */
+    .loader{ position:fixed; inset:0; z-index:999; transition:opacity .7s ease, visibility .7s ease; }
+    .loader.done{ opacity:0; visibility:hidden; pointer-events:none; }
+    .card{ position:absolute; inset:0; overflow:hidden; display:grid; place-items:center; padding:clamp(16px,4vw,28px); background:#000; color:var(--text-on-dark); }
+    .card::before{ content:""; position:absolute; inset:-30%;
+      background:repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 14px, rgba(255,255,255,0) 14px 32px);
+      animation: stripeMove 14s linear infinite; opacity:.28; pointer-events:none; z-index:0; }
+    @keyframes stripeMove{ to{ background-position:400px 0; } }
+
+    .bg-cards{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+    .poker-card{
+      position:absolute; width:64px; height:88px; border-radius:10px; background:#fff;
+      border:2px solid rgba(0,0,0,.08);
+      box-shadow:0 8px 18px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.85);
+      display:grid; place-items:center; color:#111;
+      --from:-24px; --to:24px; --rot:0deg; --dur:9s; --delay:0s;
+      transform:translateY(0) rotate(var(--rot));
+      animation: floatY var(--dur) ease-in-out var(--delay) infinite alternate;
+      opacity:.95;
+    }
+    .poker-card.red{ color:#d62828; } .poker-card.black{ color:#151515; }
+    .poker-card .pip{ font-size:30px; line-height:1; filter:drop-shadow(0 2px 0 rgba(0,0,0,.08)); }
+    .poker-card .mark{ position:absolute; font-weight:800; font-size:14px; line-height:1; }
+    .poker-card .mark.top{ top:6px; left:8px; } .poker-card .mark.bot{ bottom:6px; right:8px; transform:rotate(180deg); }
+    .poker-card .s{ margin-left:2px; }
+    @keyframes floatY{ from{ transform:translateY(var(--from)) rotate(var(--rot)); } to{ transform:translateY(var(--to)) rotate(var(--rot)); } }
+
+    .sheet{ position:relative; z-index:2; width:min(720px, 92vw); display:grid; gap:20px; justify-items:center; }
+    .brand{ position:relative; display:grid; gap:8px; justify-items:center; text-align:center; }
+    .title{
+      z-index:3; font-family:Orbitron,Poppins,system-ui,sans-serif; font-weight:800;
+      font-size:clamp(30px,6vw,54px); letter-spacing:.08em;
+      background:repeating-linear-gradient(110deg, var(--stripe-a) 0 12px, var(--stripe-b) 12px 24px, var(--stripe-c) 24px 36px, var(--stripe-d) 36px 48px);
+      background-size:240% 100%; animation:titleShift 12s linear infinite;
+      -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 0 18px rgba(0,0,0,.65);
+    }
+    @keyframes titleShift{ to{ background-position:240% 0; } }
+    .hero-card{
+      position:absolute; top:-18px; width:56px; height:78px; border-radius:10px;
+      background:#fff; border:2px solid rgba(0,0,0,.08);
+      box-shadow:0 12px 26px rgba(0,0,0,.55), 0 0 24px rgba(255,255,255,.12);
+      display:grid; place-items:center; pointer-events:none;
+      --rot:0deg; --amp:6px; --delay:0s; animation:heroBob 4.5s ease-in-out var(--delay) infinite alternate;
+      transform:translateY(0) rotate(var(--rot)); z-index:2;
+    }
+    .hero-card.left{ left:-70px; } .hero-card.right{ right:-70px; }
+    .hero-card .pip{ font-size:26px; } .hero-card .mark{ position:absolute; font-weight:800; font-size:12px; }
+    .hero-card .mark.top{ top:6px; left:8px; } .hero-card .mark.bot{ bottom:6px; right:8px; transform:rotate(180deg); }
+    .hero-card.red{ color:#d62828; } .hero-card.black{ color:#151515; }
+    @keyframes heroBob{ from{ transform:translateY(calc(var(--amp)*-1)) rotate(var(--rot)); } to{ transform:translateY(var(--amp)) rotate(var(--rot)); } }
+
+    .machine{ width:min(560px, 94%); display:grid; gap:16px; justify-items:center; }
+    .frame{
+      width:100%; height: calc(var(--symbol-size) * 3 + 24px); padding:12px; border-radius:14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.88)) padding-box,
+                 linear-gradient(135deg, rgba(255,255,255,.25), rgba(255,255,255,.15)) border-box;
+      border:2px solid transparent; box-shadow:0 22px 48px rgba(0,0,0,.55);
+      display:flex; gap:12px; align-items:center; justify-content:center;
+    }
+    .reel{ flex:1 1 0; height: calc(var(--symbol-size) * 3); overflow:hidden; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.9)); border:1px solid rgba(0,0,0,.08); position:relative; isolation:isolate; }
+    .reel::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.18), transparent 14%, transparent 86%, rgba(0,0,0,.18)); pointer-events:none; z-index:2; }
+    .track{ display:flex; flex-direction:column; align-items:stretch; animation:scroll var(--speed,1600ms) linear infinite; }
+    @keyframes scroll{ to{ transform:translateY(-50%); } }
+    .items{ display:flex; flex-direction:column; }
+    .symbol{ height:var(--symbol-size); display:grid; place-items:center; font-size:calc(var(--symbol-size) * .62); line-height:1; text-shadow:0 2px 0 rgba(0,0,0,.12); filter:drop-shadow(0 6px 12px rgba(0,0,0,.25)); }
+    .progress{ width:min(560px, 94%); display:grid; gap:10px; justify-items:center; text-align:center; }
+    .bar{ width:100%; height:16px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; border:1px solid rgba(255,255,255,.26); box-shadow:inset 0 2px 6px rgba(0,0,0,.35); }
+    .fill{ height:100%; width:0%; background:linear-gradient(90deg, var(--accent1), var(--accent2)); background-size:200% 100%; animation:flow 3s linear infinite; box-shadow:0 0 14px rgba(255,61,90,.65), 0 0 26px rgba(122,46,255,.55); transition:width .25s ease; }
+    @keyframes flow{ to{ background-position:200% 0%; } }
+    .percent{ font-family:Orbitron,Poppins,system-ui,sans-serif; font-size:clamp(14px,3.5vw,16px); letter-spacing:.2em; color:var(--muted-on-dark); text-shadow:0 2px 6px rgba(0,0,0,.65); }
+
+    /* ===== APP ===== */
+    .app{ position:relative; height:100%; background:#000; opacity:0; transform: translateY(10px) scale(.985); transition: opacity .7s ease .2s, transform .7s ease .2s; }
+    .app.ready{ opacity:1; transform:none; }
+    .app-header{
+      position:sticky; top:0; z-index:10; display:grid; place-items:center;
+      padding:14px 12px; background:#000; border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .app-header .title{
+      font-family:Orbitron,Poppins,system-ui,sans-serif; font-weight:800; letter-spacing:.06em;
+      font-size:clamp(24px, 5.5vw, 40px);
+      background:repeating-linear-gradient(110deg, var(--stripe-a) 0 12px, var(--stripe-b) 12px 24px, var(--stripe-c) 24px 36px, var(--stripe-d) 36px 48px);
+      background-size:240% 100%; animation:titleShift 12s linear infinite;
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+
+    .chat-wrap{ width:min(760px, 94vw); margin:10px auto 120px; }
+    .chat-body{ height:auto; max-height:unset; padding:8px; display:flex; flex-direction:column; gap:10px; overflow:auto; }
+    .msg{ padding:10px 12px; border-radius:12px; max-width:85%; box-shadow:0 2px 8px rgba(0,0,0,.25); white-space:pre-wrap; word-wrap:break-word; }
+    .msg.user{ align-self:flex-end; background:linear-gradient(90deg,#ff3d5a,#7a2eff); color:#fff; }
+    .msg.ai{ align-self:flex-start; background:rgba(255,255,255,.12); color:#e8eeff; border:1px solid rgba(255,255,255,.15); line-height: 1.7; }
+
+    /* Styles for bank details */
+    .msg.ai strong { color: #fff; font-weight: 600; display: block; margin-bottom: 4px;}
+    .msg.ai .detail-block { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .msg.ai .detail-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .msg.ai .copy-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: none; border: none;
+        width: 20px; height: 20px; /* NEW: ICON SIZE INCREASED */
+        margin-left: 8px;
+        vertical-align: middle;
+        cursor: pointer;
+        opacity: 0.65;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .msg.ai .copy-btn:hover { opacity: 1; transform: scale(1.1); }
+    .msg.ai .copy-btn svg { width: 100%; height: 100%; fill: #e8eeff; }
+    
+    /* NEW: HIGHLIGHT ANIMATION FOR SINGLE BANK MESSAGE */
+    .msg.ai.highlight-bank {
+        position: relative;
+        z-index: 1;
+        border: 1px solid transparent;
+    }
+    .msg.ai.highlight-bank::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: -2px; /* controls border thickness */
+        border-radius: inherit;
+        background: linear-gradient(120deg, var(--accent1), var(--accent2), var(--accent1));
+        background-size: 250% 250%;
+        animation: animated-border 3s ease-in-out infinite;
+    }
+    @keyframes animated-border {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+
+    .chat-footer{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:calc(10px + env(safe-area-inset-bottom));
+      width:min(760px, 94vw);
+      display:flex; gap:8px; align-items:center; z-index:20;
+      background:rgba(0,0,0,.4); border-radius:999px; padding:8px;
+      backdrop-filter: blur(6px); box-shadow: 0 8px 20px rgba(0,0,0,.55);
+    }
+    .chat-footer input{
+      flex:1; background:#121212; color:#eaf0ff;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px; padding:12px 14px; outline:none;
+    }
+    .chat-footer button{
+      background:linear-gradient(90deg,#ff3d5a,#7a2eff);
+      color:#fff; border:0; padding:12px 16px; border-radius:999px; font-weight:700; cursor:pointer;
+      box-shadow:0 6px 16px rgba(122,46,255,.35);
+    }
+
+    @media (max-width:520px){
+      :root{ --symbol-size:54px; }
+      .hero-card{ width:48px; height:68px; top:-20px; }
+      .hero-card.left{ left:-56px; } .hero-card.right{ right:-56px; }
+      .chat-footer{ padding:6px; }
+      .chat-footer button{ padding:10px 14px; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .track, .fill, .title, .card::before, .hero-card, .msg.ai.highlight-bank::before{ animation:none !important; }
+      .fill{ transition:width .3s linear; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== FULL-SCREEN LOADER ===== -->
+  <section class="loader" id="loader">
+    <div class="card">
+      <div class="bg-cards" aria-hidden="true">
+        <div class="poker-card red" style="left:18%; top:68%; --from:-22px; --to:22px; --rot:-6deg; --dur:9s; --delay:-2s;">
+          <div class="mark top">9<span class="s">♦</span></div><div class="pip">♦</div><div class="mark bot">9<span class="s">♦</span></div>
+        </div>
+        <div class="poker-card black" style="left:50%; top:28%; --from:-26px; --to:26px; --rot:3deg; --dur:10s; --delay:-3s;">
+          <div class="mark top">Q<span class="s">♠</span></div><div class="pip">♠</div><div class="mark bot">Q<span class="s">♠</span></div>
+        </div>
+        <div class="poker-card red" style="left:78%; top:56%; --from:-24px; --to:24px; --rot:7deg; --dur:8.5s; --delay:-1.5s;">
+          <div class="mark top">J<span class="s">♥</span></div><div class="pip">♥</div><div class="mark bot">J<span class="s">♥</span></div>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="brand">
+          <div class="hero-card black left" style="--rot:-12deg; --amp:8px; --delay:-1s;">
+            <div class="mark top">A<span class="s">♠</span></div><div class="pip">♠</div><div class="mark bot">A<span class="s">♠</span></div>
+          </div>
+          <div class="hero-card red right" style="--rot:12deg; --amp:6px; --delay:-2s;">
+            <div class="mark top">K<span class="s">♥</span></div><div class="pip">♥</div><div class="mark bot">K<span class="s">♥</span></div>
+          </div>
+          <div class="title">Official Dana</div>
+        </div>
+
+        <!-- Slot machine + progress -->
+        <div class="machine">
+          <div class="frame">
+            <div class="reel"><div class="track" style="--speed: 1800ms">
+              <div class="items">
+                <div class="symbol">🍒</div><div class="symbol">💎</div><div class="symbol">7️⃣</div><div class="symbol">🔔</div><div class="symbol">🍀</div><div class="symbol">⭐</div><div class="symbol">🎲</div><div class="symbol">🃏</div><div class="symbol">💰</div><div class="symbol">🏆</div>
+              </div><div class="items">
+                <div class="symbol">🍒</div><div class="symbol">💎</div><div class="symbol">7️⃣</div><div class="symbol">🔔</div><div class="symbol">🍀</div><div class="symbol">⭐</div><div class="symbol">🎲</div><div class="symbol">🃏</div><div class="symbol">💰</div><div class="symbol">🏆</div>
+              </div></div></div>
+            <div class="reel"><div class="track" style="--speed: 1400ms">
+              <div class="items">
+                <div class="symbol">💎</div><div class="symbol">🔔</div><div class="symbol">7️⃣</div><div class="symbol">🍒</div><div class="symbol">🎲</div><div class="symbol">⭐</div><div class="symbol">🃏</div><div class="symbol">🍀</div><div class="symbol">💰</div><div class="symbol">🏆</div>
+              </div><div class="items">
+                <div class="symbol">💎</div><div class="symbol">🔔</div><div class="symbol">7️⃣</div><div class="symbol">🍒</div><div class="symbol">🎲</div><div class="symbol">⭐</div><div class="symbol">🃏</div><div class="symbol">🍀</div><div class="symbol">💰</div><div class="symbol">🏆</div>
+              </div></div></div>
+            <div class="reel"><div class="track" style="--speed: 2000ms">
+              <div class="items">
+                <div class="symbol">🃏</div><div class="symbol">🍀</div><div class="symbol">💎</div><div class="symbol">7️⃣</div><div class="symbol">🔔</div><div class="symbol">🎲</div><div class="symbol">🍒</div><div class="symbol">⭐</div><div class="symbol">💰</div><div class="symbol">🏆</div>
+              </div><div class="items">
+                <div class="symbol">🃏</div><div class="symbol">🍀</div><div class="symbol">💎</div><div class="symbol">7️⃣</div><div class="symbol">🔔</div><div class="symbol">🎲</div><div class="symbol">🍒</div><div class="symbol">⭐</div><div class="symbol">💰</div><div class="symbol">🏆</div>
+              </div></div></div>
+          </div>
+
+          <div class="progress">
+            <div class="bar"><div class="fill" id="fill"></div></div>
+            <div class="percent" id="percent">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== APP ===== -->
+  <main class="app" id="app">
+    <header class="app-header" id="appHeader">
+      <div class="title">Official Dana</div>
+    </header>
+
+    <section class="chat-wrap">
+      <div class="chat-body" id="chatBody"></div>
+    </section>
+
+    <!-- Composer fixed bottom -->
+    <form class="chat-footer" id="chatForm">
+      <input id="chatText" type="text" placeholder="Type your message..." autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+  </main>
+
+  <script>
+    /* ==== Loader ~10s + welcome sound DURING loading ==== */
+    (function(){
+      const fill = document.getElementById('fill');
+      const percent = document.getElementById('percent');
+      const loader = document.getElementById('loader');
+      const app = document.getElementById('app');
+
+      const DURATION = 10000;
+      let start = null, startedWelcome = false;
+      const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+      function step(ts){
+        if(!start) start = ts;
+        if(!startedWelcome){ startedWelcome = true; setTimeout(()=>tryPlayWelcome(), 150); }
+        const t = Math.min((ts - start) / DURATION, 1);
+        const p = Math.floor(easeOutCubic(t) * 100);
+        fill.style.width = p + '%';
+        percent.textContent = p + '%';
+        if (t < 1) requestAnimationFrame(step);
+        else { loader.classList.add('done'); app.classList.add('ready'); fitChatHeight(); }
+      }
+      requestAnimationFrame(step);
+    })();
+
+    /* ==== Welcome sound (chime + English TTS) ==== */
+    let audioCtx = null, playedWelcome = false;
+    const getAudioCtx = () => (audioCtx ||= new (window.AudioContext||window.webkitAudioContext)());
+    function playChime(ctx){
+      if(!ctx) return;
+      const master = ctx.createGain(); master.gain.value = 0.28; master.connect(ctx.destination);
+      const delay = ctx.createDelay(2); delay.delayTime.value = 0.18;
+      const fb = ctx.createGain(); fb.gain.value = 0.18; delay.connect(fb); fb.connect(delay); delay.connect(master);
+      const note = (f,t,d,v=0.28)=>{ const o=ctx.createOscillator(); o.type='sine'; o.frequency.value=f; const g=ctx.createGain();
+        g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(v,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+        o.connect(g); g.connect(master); g.connect(delay); o.start(t); o.stop(t+d+0.05); };
+      const now = ctx.currentTime + 0.05;
+      note(659.25, now, 0.28, 0.25); note(987.77, now+0.10, 0.30, 0.22); note(1318.51, now+0.20, 0.45, 0.20);
+    }
+    function speakWelcome(){
+      if (!('speechSynthesis' in window)) return true;
+      const u = new SpeechSynthesisUtterance('Welcome to Official Dana A.I.');
+      u.lang='en-US'; u.rate=1; u.pitch=1; u.volume=1;
+      const vs = speechSynthesis.getVoices();
+      u.voice = vs.find(v=>/Google US English/i.test(v.name))
+            || vs.find(v=>/Samantha/i.test(v.name))
+            || vs.find(v=>/en(-|_)US/i.test(v.lang))
+            || vs.find(v=>/^en/i.test(v.lang));
+      setTimeout(()=>speechSynthesis.speak(u), 250);
+      return true;
+    }
+    async function tryPlayWelcome(){
+      if (playedWelcome) return;
+      try{
+        const AC = getAudioCtx(); if (AC && AC.state === 'suspended') await AC.resume();
+        playChime(AC); speakWelcome(); playedWelcome = true;
+      }catch(e){ /* autoplay blocked නම් නිහඬව ඉදිරියට යයි */ }
+    }
+
+    // ===== BANK DETAILS & BOT LOGIC =====
+    
+    const SVG_COPY = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
+    const SVG_CHECK = `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+    
+    // NEW: Keywords list updated for better matching
+    const bankDetails = [
+        { 
+            name: 'Dialog Finance PLC Bank', label: 'Account Number', value: '001020600786',
+            holder: 'RAPL Wijesinghe', branch: 'Head Office', keywords: ['dialog', 'finance'] 
+        },
+        { 
+            name: 'Peoples Bank', label: 'Account Number', value: '193200480085014',
+            holder: 'RAPL Wijesinghe', branch: 'Rideegama', keywords: ['peoples', 'මහජන', 'janatha'] 
+        },
+        { 
+            name: 'BOC Bank', label: 'Account Number', value: '89888946',
+            holder: 'RAPL Wijesinghe', branch: 'Rideegama', keywords: ['boc', 'ලංකා', 'bank of ceylon'] 
+        },
+        { 
+            name: 'Commercial Bank', label: 'Account Number', value: '8024352082',
+            holder: 'RAPL Wijesinghe', branch: 'Ibbagamuwa', keywords: ['commercial', 'කොමර්ෂල්', 'combank'] 
+        },
+        { 
+            name: 'EZcash', label: 'Number', value: '0776659058',
+            holder: 'Rapl Wijesinghe', branch: null, keywords: ['ezcash', 'ez cash'] 
+        },
+        { 
+            name: 'Ipay', label: 'Number', value: '0776659058',
+            holder: 'Rapl Wijesinghe', branch: null, keywords: ['ipay'] 
+        },
+        { 
+            name: 'Binance', label: 'ID (USDT)', value: '508412222',
+            holder: 'User ID', branch: null, keywords: ['binance', 'usdt', 'crypto', 'bince', 'binace'] 
+        }
+    ];
+
+    function createDetailHtml(detail) {
+        let html = `<div class="detail-block"><strong>${detail.name}</strong>`;
+        html += `${detail.label}: ${detail.value} <button class="copy-btn" data-copy="${detail.value}" title="Copy Number">${SVG_COPY}</button><br>`;
+        html += `Name: ${detail.holder} <button class="copy-btn" data-copy="${detail.holder}" title="Copy Name">${SVG_COPY}</button>`;
+        if (detail.branch) {
+            html += `<br>Branch: ${detail.branch}`;
+        }
+        html += '</div>';
+        return html;
+    }
+
+    // NEW: botReply function now returns an object with type and content
+    function botReply(text){
+      const raw = (text||"").trim();
+      const t = raw.toLowerCase();
+
+      // Check for specific bank keywords
+      for (const detail of bankDetails) {
+          if (detail.keywords.some(kw => t.includes(kw))) {
+              return { type: 'single_bank', content: createDetailHtml(detail) };
+          }
+      }
+      // Check for general bank keywords
+      if (/bank|account|detail|විස්තර|ගිණුම්|giṇum|wistara|number|detils/i.test(t)) {
+          return { type: 'multi_bank', content: bankDetails.map(createDetailHtml).join('') };
+      }
+
+      // Greetings & Small Talk
+      let replyText = '';
+      if (/(^|\s)gm($|\s)|good\s*morn|සුභ.*උදෑසන|සුභ\s*උදේ/.test(t)) replyText = "GOOD MORNING සහෝදරයා 😊";
+      else if (/(^|\s)gn($|\s)|good\s*night|සුභ.*රාත්|සුභ\s*රෑ/.test(t)) replyText = "GOOD NIGHT සහෝදරයා 😊";
+      else if (/hello|hi|hey|ආයුබෝවන්/.test(t)) replyText = "ආයුබෝවන්! කොහොමද? 😊";
+      else if (/how\s*are\s*you|hru|කොහොමද|kohom(da|ada)/.test(t)) replyText = "මම හොඳයි! ඔයාට කොහොමද? 😄";
+      else if (/who\s*are\s*you|name|ඔබ\s*කවුද/.test(t)) replyText = "මම Official Dana AI. ඔයාට මොනවද උදව් කරන්නෙ? 🤝";
+      else if (/thank(s| you)?|ස්තුතියි|stuthi/.test(t)) replyText = "ඔයාටත් බොහොම ස්තුතියි! 🙏";
+      else {
+        const acks = ["හරි! 😊", "අදහස් ගත්තා 👍", "සුපිරි! 💯", "හොඳයි! 😌", "ඔස්සෝ! 😄"];
+        replyText = acks[Math.floor(Math.random()*acks.length)];
+      }
+      
+      return { type: 'text', content: replyText };
+    }
+
+    /* ==== Chat front-end ==== */
+    (function(){
+      const chatBody = document.getElementById("chatBody");
+      const chatForm = document.getElementById("chatForm");
+      const chatText = document.getElementById("chatText");
+
+      function addUserMsg(content){
+        const div = document.createElement("div");
+        div.className = "msg user";
+        div.textContent = content;
+        chatBody.appendChild(div);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+      
+      function addBotMsg(replyObject){
+        const div = document.createElement("div");
+        div.className = "msg ai";
+        div.innerHTML = replyObject.content;
+        
+        // NEW: Add highlight class if it's a single bank reply
+        if (replyObject.type === 'single_bank') {
+            div.classList.add('highlight-bank');
+        }
+        
+        chatBody.appendChild(div);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      chatForm.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        const text = chatText.value.trim();
+        if (!text) return;
+        addUserMsg(text);
+        chatText.value = "";
+        
+        const reply = botReply(text);
+        setTimeout(()=> addBotMsg(reply), 400);
+      });
+
+      chatBody.addEventListener('click', function(e) {
+          const button = e.target.closest('.copy-btn');
+          if (button) {
+              e.preventDefault();
+              const textToCopy = button.dataset.copy;
+              navigator.clipboard.writeText(textToCopy).then(() => {
+                  button.innerHTML = SVG_CHECK;
+                  button.disabled = true;
+                  setTimeout(() => {
+                      button.innerHTML = SVG_COPY;
+                      button.disabled = false;
+                  }, 1500);
+              }).catch(err => {
+                  console.error('Failed to copy: ', err);
+              });
+          }
+      });
+    })();
+
+    /* ==== Layout: chat-body height ==== */
+    function fitChatHeight(){
+      const header = document.getElementById('appHeader');
+      const footer = document.getElementById('chatForm');
+      const body = document.getElementById('chatBody');
+      if(!body) return;
+      const vh = window.innerHeight;
+      const hH = header ? header.offsetHeight : 0;
+      const fH = footer ? footer.offsetHeight + 20 : 0;
+      const avail = Math.max(140, vh - hH - fH - 30);
+      body.style.maxHeight = avail + 'px';
+      body.style.height = avail + 'px';
+    }
+    window.addEventListener('resize', fitChatHeight);
+    window.addEventListener('orientationchange', fitChatHeight);
+    if (window.visualViewport){
+      window.visualViewport.addEventListener('resize', fitChatHeight);
+    }
+  </script>
+</body>
+</html>
