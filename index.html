@@ -53,7 +53,13 @@
     @keyframes floatY{ from{ transform:translateY(var(--from)) rotate(var(--rot)); } to{ transform:translateY(var(--to)) rotate(var(--rot)); } }
 
     .sheet{ position:relative; z-index:2; width:min(720px, 92vw); display:grid; gap:20px; justify-items:center; }
-    .brand{ position:relative; display:grid; gap:8px; justify-items:center; text-align:center; }
+    
+    /* MODIFIED: Increased the 'bottom' value to move the brand name further up */
+    .brand{ 
+      position:relative; display:grid; gap:8px; justify-items:center; text-align:center;
+      bottom: 50px;
+    }
+
     .title{
       z-index:3; font-family:Orbitron,Poppins,system-ui,sans-serif; font-weight:800;
       font-size:clamp(30px,6vw,54px); letter-spacing:.08em;
@@ -137,7 +143,6 @@
     }
     @keyframes animated-border { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-    /* NEW: PROMO & WHATSAPP BUTTONS */
     .msg.ai .detail-block > div { margin-bottom: 6px; }
     .msg.ai .detail-block > div:last-child { margin-bottom: 0; }
     .msg.ai .promo-link { color: #87CEEB; text-decoration: none; font-weight: 600; transition: color .2s; }
@@ -148,6 +153,23 @@
         font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .2s ease;
     }
     .msg.ai .whatsapp-btn:hover { transform: scale(1.05); }
+
+    /* YouTube button styles */
+    .msg.ai .youtube-btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        background: linear-gradient(90deg, #1db954, #1ed760);
+        color: #fff; padding: 10px 18px; margin-top: 8px; border-radius: 8px; text-decoration: none;
+        font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .2s ease;
+    }
+    .msg.ai .youtube-btn:hover { transform: scale(1.05); }
+    .msg.ai .youtube-btn svg {
+        width: 18px; height: 18px; margin-left: 8px; vertical-align: middle;
+    }
+
+    /* Styles for the Hack warning message */
+    .msg.ai p { margin: 1em 0; }
+    .msg.ai ul { margin: .5em 0 1em; padding-left: 25px; }
+    .msg.ai li { margin-bottom: .5em; }
 
     .chat-footer{
       position:fixed; left:50%; transform:translateX(-50%);
@@ -322,6 +344,31 @@
     const SVG_COPY = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
     const SVG_CHECK = `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
     
+    const hackWarningMessage = `
+        <p>මට ඔබට 1xBet Crash game එක හැක් කිරීමට උදව් කරන්න බැහැ. ඒකට හේතු කිහිපයක් තියෙනවා, කරුණාකර මේ ගැන හොඳින් හිතන්න.</p>
+        <strong>1. එය කළ නොහැකියි (It is impossible):</strong>
+        <p>Crash game වැනි ඔන්ලයින් සූදු ක්‍රීඩා වල ප්‍රතිඵල (crash point එක) තීරණය වෙන්නේ ඔබගේ දුරකතනයේ හෝ පරිගණකයේ නෙවෙයි. ඒවා තීරණය වෙන්නේ ඉතා සුරක්ෂිත, බලවත් සර්වර් (server) එකකයි. ඒ නිසා පිටතින් කිසිම මෘදුකාංගයකට (software) හෝ පුද්ගලයෙකුට ඒ ප්‍රතිඵල වෙනස් කරන්නවත්, කලින් දැනගන්නවත් <strong>බැහැ</strong>.</p>
+        <strong>2. ඔබ වංචාවකට හසුවෙන්න පුළුවන් (You will get scammed):</strong>
+        <p>අන්තර්ජාලයේ "Crash game hack," "Predictor app," "Aviator bot" වැනි දේවල් විකුණන බව කියන දැන්වීම් සහ වීඩියෝ ඔබ දැක ඇති. <strong>මේවා 100%ක්ම වංචාකාරී දේවල්.</strong></p>
+        <p>ඔවුන් කරන්නේ:</p>
+        <ul>
+            <li>ඔබෙන් මුදල් ලබාගෙන වැඩ නොකරන ඇප් (app) එකක් දීම.</li>
+            <li>ඔබේ දුරකථනයට හෝ පරිගණකයට වෛරස් (virus) ඇතුළු කර, ඔබේ බැංකු තොරතුරු, මුරපද (passwords) වැනි පෞද්ගලික දත්ත සොරකම් කිරීම.</li>
+            <li>ඔබේ 1xBet ගිණුමට ප්‍රවේශ වී එහි ඇති මුදල් සොරකම් කිරීම.</li>
+        </ul>
+        <p><strong>කවුරුහරි ඔබට Crash game එක හැක් කරන්න පුළුවන් කිව්වොත්, ඔවුන් උත්සාහ කරන්නේ ඔබව රවටන්නයි.</strong></p>
+        <strong>3. ඔබේ ගිණුම තහනම් වේවි (Your account will be banned):</strong>
+        <p>ඔබ යම් හෝ හැක් කිරීමට උත්සාහ කරන මෘදුකාංගයක් භාවිතා කළහොත්, 1xBet සමාගමට එය හඳුනාගැනීමට හැකියාව තිබෙනවා. එසේ වුවහොත්, ඔවුන් <strong>ඔබේ ගිණුම శాశ్వతంగాම තහනම් (permanently ban) කරනු ඇති අතර, එහි ඇති සියලුම මුදල් ඔබට අහිමි වේවි.</strong></p>
+        <strong>වගකීමෙන් යුතුව ක්‍රීඩා කරන්න</strong>
+        <p>Crash game කියන්නේ සම්පූර්ණයෙන්ම <strong>වාසනාව මත පදනම් වූ</strong> ක්‍රීඩාවක්. එය හැක් කිරීමට ක්‍රමයක් නැහැ. ඒ නිසා, මුදල් නැති කරගැනීම වෙනුවට වගකීමෙන් ක්‍රීඩා කිරීම වැදගත්:</p>
+        <ul>
+            <li>ඔබට අහිමි කරගත හැකි මුදලක් පමණක් යොදවන්න.</li>
+            <li>පරාජයන් පසුපස හඹා යන්න එපා (Don't chase losses).</li>
+            <li>මෙය විනෝදාංශයක් ලෙස පමණක් සලකන්න.</li>
+        </ul>
+        <p>ඔබට සූදුව සම්බන්ධයෙන් පාලනයක් නොමැති බව හැඟේ නම්, කරුණාකර උදව් ලබාගන්න. ඔබේ මුදල් සහ පෞද්ගලික දත්ත වංචාකාරයින්ගෙන් ආරක්ෂා කරගන්න.</p>
+    `;
+
     const bankDetails = [
         { name: 'Dialog Finance PLC Bank', label: 'Account Number', value: '001020600786', holder: 'RAPL Wijesinghe', branch: 'Head Office', keywords: ['dialog', 'finance'] },
         { name: 'Peoples Bank', label: 'Account Number', value: '193200480085014', holder: 'RAPL Wijesinghe', branch: 'Rideegama', keywords: ['peoples', 'මහජන', 'janatha'] },
@@ -332,7 +379,6 @@
         { name: 'Binance', label: 'ID (USDT)', value: '508412222', holder: 'User ID', branch: null, keywords: ['binance', 'usdt', 'crypto', 'bince', 'binace'] }
     ];
 
-    // NEW: Promo Code Data
     const promoDetails = [
         { name: '1xBet', code: 'Dana113', link: 'https://affpa.top/L?tag=d_3445710m_1236c_&site=3445710&ad=1236', keywords: ['1xbet', '1x bet'] },
         { name: 'Melbet', code: 'DANA113', link: 'https://refpakrtsb.top/L?tag=d_4382774m_66335c_&site=4382774&ad=66335', keywords: ['melbet'] },
@@ -350,7 +396,6 @@
         return html;
     }
 
-    // NEW: Helper function to create Promo HTML
     function createPromoHtml(detail) {
         let html = `<div class="detail-block"><strong>⭕ ${detail.name}</strong>`;
         html += `<div>⭐ Promo Code: <strong>${detail.code}</strong> <button class="copy-btn" data-copy="${detail.code}" title="Copy Code">${SVG_COPY}</button></div>`;
@@ -365,6 +410,20 @@
       const raw = (text||"").trim();
       const t = raw.toLowerCase();
 
+      // --- Priority 0: HIGHEST - Hacking/Scam warning ---
+      if (/(hack|හැක්|hake)/i.test(t)) {
+        return { type: 'text', content: hackWarningMessage };
+      }
+
+      // --- YouTube Link ---
+      const youtubeKeywords = /youtube|yt|avitor video|mega sic bo|crystal/i;
+      if (youtubeKeywords.test(t)) {
+          const SVG_VERIFIED = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM9.29 16.29L5.7 12.7c-.39-.39-.39-1.02 0-1.41s1.02-.39 1.41 0L10 14.17l5.88-5.88c.39-.39 1.02-.39 1.41 0s.39 1.02 0 1.41L10.7 16.29c-.38.39-1.02.39-1.41 0z"/></svg>';
+          const url = 'https://youtube.com/@dan_1xbet_cash_agent?si=j3Q3HLa_T8z_N9WC';
+          const content = `මගේ Official YouTube channel එකට යන්න පහත බොත්තම ක්ලික් කරන්න. 👇<br><br><a href="${url}" class="youtube-btn" target="_blank" rel="noopener noreferrer">Official Dana ${SVG_VERIFIED}</a>`;
+          return { type: 'text', content: content };
+      }
+
       // --- Priority 1: Specific Commands ---
       if (t.includes('ධානව සම්බන්ධ කරන්න')) {
           const url = 'https://wa.me/94771400902?text=' + encodeURIComponent('හේලෝ ධන කොහොමද');
@@ -372,14 +431,12 @@
           return { type: 'text', content: content };
       }
       
-      // NEW: Check for SPECIFIC promo code requests first
       for (const detail of promoDetails) {
           if (detail.keywords.some(kw => t.includes(kw))) {
               return { type: 'text', content: createPromoHtml(detail) };
           }
       }
 
-      // Check for SPECIFIC bank keywords
       for (const detail of bankDetails) {
           if (detail.keywords.some(kw => t.includes(kw))) {
               return { type: 'single_bank', content: createDetailHtml(detail) };
@@ -387,7 +444,6 @@
       }
 
       // --- Priority 2: General Keyword Commands ---
-      // NEW: Check for GENERAL promo code requests
       if (t.includes('promo') || t.includes('code') || t.includes('ප්‍රොමෝ')) {
           const allPromosHtml = promoDetails.map(createPromoHtml).join('');
           return { type: 'text', content: allPromosHtml };
@@ -403,6 +459,12 @@
         `<div class="detail-block">0710957023 <button class="copy-btn" data-copy="0710957023" title="Copy Number">${SVG_COPY}</button></div>` +
         `<div class="detail-block">0742517405 <button class="copy-btn" data-copy="0742517405" title="Copy Number">${SVG_COPY}</button></div>`;
         return { type: 'text', content: content };
+      }
+
+      // --- Funny/Flirty Reply ---
+      const flirtyKeywords = /දනට පිස්සුද|පුක සුදුද|කැවද බම්|pisud|puka sudu|kewada|kaewada/i;
+      if (flirtyKeywords.test(t)) {
+          return { type: 'text', content: "චුටි චුටි හොර ගෙඩිය ආදරෙයි උම්මා කැටේ 😗" };
       }
 
       // --- Priority 3: Greetings & Fallbacks ---
