@@ -117,47 +117,37 @@
     .msg.user{ align-self:flex-end; background:linear-gradient(90deg,#ff3d5a,#7a2eff); color:#fff; }
     .msg.ai{ align-self:flex-start; background:rgba(255,255,255,.12); color:#e8eeff; border:1px solid rgba(255,255,255,.15); line-height: 1.7; }
 
-    /* Styles for bank details */
+    /* Styles for info blocks */
     .msg.ai strong { color: #fff; font-weight: 600; display: block; margin-bottom: 4px;}
     .msg.ai .detail-block { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.1); }
     .msg.ai .detail-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
     .msg.ai .copy-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: none; border: none;
-        width: 20px; height: 20px; /* NEW: ICON SIZE INCREASED */
-        margin-left: 8px;
-        vertical-align: middle;
-        cursor: pointer;
-        opacity: 0.65;
-        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; background: none; border: none;
+        width: 20px; height: 20px; margin-left: 8px; vertical-align: middle; cursor: pointer;
+        opacity: 0.65; transition: opacity 0.2s ease, transform 0.2s ease;
     }
     .msg.ai .copy-btn:hover { opacity: 1; transform: scale(1.1); }
     .msg.ai .copy-btn svg { width: 100%; height: 100%; fill: #e8eeff; }
     
-    /* NEW: HIGHLIGHT ANIMATION FOR SINGLE BANK MESSAGE */
-    .msg.ai.highlight-bank {
-        position: relative;
-        z-index: 1;
-        border: 1px solid transparent;
-    }
+    .msg.ai.highlight-bank { position: relative; z-index: 1; border: 1px solid transparent; }
     .msg.ai.highlight-bank::before {
-        content: "";
-        position: absolute;
-        z-index: -1;
-        inset: -2px; /* controls border thickness */
-        border-radius: inherit;
+        content: ""; position: absolute; z-index: -1; inset: -2px; border-radius: inherit;
         background: linear-gradient(120deg, var(--accent1), var(--accent2), var(--accent1));
-        background-size: 250% 250%;
-        animation: animated-border 3s ease-in-out infinite;
+        background-size: 250% 250%; animation: animated-border 3s ease-in-out infinite;
     }
-    @keyframes animated-border {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+    @keyframes animated-border { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
+    /* NEW: PROMO & WHATSAPP BUTTONS */
+    .msg.ai .detail-block > div { margin-bottom: 6px; }
+    .msg.ai .detail-block > div:last-child { margin-bottom: 0; }
+    .msg.ai .promo-link { color: #87CEEB; text-decoration: none; font-weight: 600; transition: color .2s; }
+    .msg.ai .promo-link:hover { color: #fff; text-decoration: underline; }
+    .msg.ai .whatsapp-btn {
+        display: inline-block; background: linear-gradient(90deg, var(--accent1), var(--accent2));
+        color: #fff; padding: 10px 18px; margin-top: 8px; border-radius: 8px; text-decoration: none;
+        font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .2s ease;
+    }
+    .msg.ai .whatsapp-btn:hover { transform: scale(1.05); }
 
     .chat-footer{
       position:fixed; left:50%; transform:translateX(-50%);
@@ -327,71 +317,95 @@
       }catch(e){ /* autoplay blocked නම් නිහඬව ඉදිරියට යයි */ }
     }
 
-    // ===== BANK DETAILS & BOT LOGIC =====
+    // ===== BOT DATA & LOGIC =====
     
     const SVG_COPY = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
     const SVG_CHECK = `<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
     
-    // NEW: Keywords list updated for better matching
     const bankDetails = [
-        { 
-            name: 'Dialog Finance PLC Bank', label: 'Account Number', value: '001020600786',
-            holder: 'RAPL Wijesinghe', branch: 'Head Office', keywords: ['dialog', 'finance'] 
-        },
-        { 
-            name: 'Peoples Bank', label: 'Account Number', value: '193200480085014',
-            holder: 'RAPL Wijesinghe', branch: 'Rideegama', keywords: ['peoples', 'මහජන', 'janatha'] 
-        },
-        { 
-            name: 'BOC Bank', label: 'Account Number', value: '89888946',
-            holder: 'RAPL Wijesinghe', branch: 'Rideegama', keywords: ['boc', 'ලංකා', 'bank of ceylon'] 
-        },
-        { 
-            name: 'Commercial Bank', label: 'Account Number', value: '8024352082',
-            holder: 'RAPL Wijesinghe', branch: 'Ibbagamuwa', keywords: ['commercial', 'කොමර්ෂල්', 'combank'] 
-        },
-        { 
-            name: 'EZcash', label: 'Number', value: '0776659058',
-            holder: 'Rapl Wijesinghe', branch: null, keywords: ['ezcash', 'ez cash'] 
-        },
-        { 
-            name: 'Ipay', label: 'Number', value: '0776659058',
-            holder: 'Rapl Wijesinghe', branch: null, keywords: ['ipay'] 
-        },
-        { 
-            name: 'Binance', label: 'ID (USDT)', value: '508412222',
-            holder: 'User ID', branch: null, keywords: ['binance', 'usdt', 'crypto', 'bince', 'binace'] 
-        }
+        { name: 'Dialog Finance PLC Bank', label: 'Account Number', value: '001020600786', holder: 'RAPL Wijesinghe', branch: 'Head Office', keywords: ['dialog', 'finance'] },
+        { name: 'Peoples Bank', label: 'Account Number', value: '193200480085014', holder: 'RAPL Wijesinghe', branch: 'Rideegama', keywords: ['peoples', 'මහජන', 'janatha'] },
+        { name: 'BOC Bank', label: 'Account Number', value: '89888946', holder: 'RAPL Wijesinghe', branch: 'Rideegama', keywords: ['boc', 'ලංකා', 'bank of ceylon'] },
+        { name: 'Commercial Bank', label: 'Account Number', value: '8024352082', holder: 'RAPL Wijesinghe', branch: 'Ibbagamuwa', keywords: ['commercial', 'කොමර්ෂල්', 'combank'] },
+        { name: 'EZcash', label: 'Number', value: '0776659058', holder: 'Rapl Wijesinghe', branch: null, keywords: ['ezcash', 'ez cash'] },
+        { name: 'Ipay', label: 'Number', value: '0776659058', holder: 'Rapl Wijesinghe', branch: null, keywords: ['ipay'] },
+        { name: 'Binance', label: 'ID (USDT)', value: '508412222', holder: 'User ID', branch: null, keywords: ['binance', 'usdt', 'crypto', 'bince', 'binace'] }
+    ];
+
+    // NEW: Promo Code Data
+    const promoDetails = [
+        { name: '1xBet', code: 'Dana113', link: 'https://affpa.top/L?tag=d_3445710m_1236c_&site=3445710&ad=1236', keywords: ['1xbet', '1x bet'] },
+        { name: 'Melbet', code: 'DANA113', link: 'https://refpakrtsb.top/L?tag=d_4382774m_66335c_&site=4382774&ad=66335', keywords: ['melbet'] },
+        { name: '888Start', code: 'DANA113', link: 'https://buy785.online/L?tag=d_4382809m_45159c_&site=4382809&ad=45159', keywords: ['888start', '888 start', '888'] },
+        { name: 'DB BET', code: 'DANA113', link: null, keywords: ['dbbet', 'db bet'] },
+        { name: 'PARI PULES', code: 'MX955', link: 'https://refpa00186.com/L?tag=d_4626661m_64499c_&site=4626661&ad=64499&r=promotions/first-deposit', keywords: ['pari pules', 'paripules', 'pari'] }
     ];
 
     function createDetailHtml(detail) {
         let html = `<div class="detail-block"><strong>${detail.name}</strong>`;
         html += `${detail.label}: ${detail.value} <button class="copy-btn" data-copy="${detail.value}" title="Copy Number">${SVG_COPY}</button><br>`;
         html += `Name: ${detail.holder} <button class="copy-btn" data-copy="${detail.holder}" title="Copy Name">${SVG_COPY}</button>`;
-        if (detail.branch) {
-            html += `<br>Branch: ${detail.branch}`;
+        if (detail.branch) { html += `<br>Branch: ${detail.branch}`; }
+        html += '</div>';
+        return html;
+    }
+
+    // NEW: Helper function to create Promo HTML
+    function createPromoHtml(detail) {
+        let html = `<div class="detail-block"><strong>⭕ ${detail.name}</strong>`;
+        html += `<div>⭐ Promo Code: <strong>${detail.code}</strong> <button class="copy-btn" data-copy="${detail.code}" title="Copy Code">${SVG_COPY}</button></div>`;
+        if (detail.link) {
+            html += `<div>⭐ Link: <a href="${detail.link}" class="promo-link" target="_blank" rel="noopener noreferrer">Go to Site ↗️</a></div>`;
         }
         html += '</div>';
         return html;
     }
 
-    // NEW: botReply function now returns an object with type and content
     function botReply(text){
       const raw = (text||"").trim();
       const t = raw.toLowerCase();
 
-      // Check for specific bank keywords
+      // --- Priority 1: Specific Commands ---
+      if (t.includes('ධානව සම්බන්ධ කරන්න')) {
+          const url = 'https://wa.me/94771400902?text=' + encodeURIComponent('හේලෝ ධන කොහොමද');
+          const content = `ධානව කෙලින්ම සම්බන්ධ කරගැනීමට පහත බොත්තම ක්ලික් කරන්න. 👇<br><br><a href="${url}" class="whatsapp-btn" target="_blank" rel="noopener noreferrer">WhatsApp මගින් සම්බන්ධ වන්න</a>`;
+          return { type: 'text', content: content };
+      }
+      
+      // NEW: Check for SPECIFIC promo code requests first
+      for (const detail of promoDetails) {
+          if (detail.keywords.some(kw => t.includes(kw))) {
+              return { type: 'text', content: createPromoHtml(detail) };
+          }
+      }
+
+      // Check for SPECIFIC bank keywords
       for (const detail of bankDetails) {
           if (detail.keywords.some(kw => t.includes(kw))) {
               return { type: 'single_bank', content: createDetailHtml(detail) };
           }
       }
-      // Check for general bank keywords
-      if (/bank|account|detail|විස්තර|ගිණුම්|giṇum|wistara|number|detils/i.test(t)) {
+
+      // --- Priority 2: General Keyword Commands ---
+      // NEW: Check for GENERAL promo code requests
+      if (t.includes('promo') || t.includes('code') || t.includes('ප්‍රොමෝ')) {
+          const allPromosHtml = promoDetails.map(createPromoHtml).join('');
+          return { type: 'text', content: allPromosHtml };
+      }
+      
+      if (/bank|account|detail|විස්තර|ගිණුම්|giṇum|wistara|detils/i.test(t)) {
           return { type: 'multi_bank', content: bankDetails.map(createDetailHtml).join('') };
       }
+      
+      if (/(whatsapp|whtsapp|watsap|phone|no|number|අංකය|දුරකථන)/.test(t)) {
+        const content = `<strong>WhatsApp Numbers</strong>` +
+        `<div class="detail-block">0771400902 <button class="copy-btn" data-copy="0771400902" title="Copy Number">${SVG_COPY}</button></div>` +
+        `<div class="detail-block">0710957023 <button class="copy-btn" data-copy="0710957023" title="Copy Number">${SVG_COPY}</button></div>` +
+        `<div class="detail-block">0742517405 <button class="copy-btn" data-copy="0742517405" title="Copy Number">${SVG_COPY}</button></div>`;
+        return { type: 'text', content: content };
+      }
 
-      // Greetings & Small Talk
+      // --- Priority 3: Greetings & Fallbacks ---
       let replyText = '';
       if (/(^|\s)gm($|\s)|good\s*morn|සුභ.*උදෑසන|සුභ\s*උදේ/.test(t)) replyText = "GOOD MORNING සහෝදරයා 😊";
       else if (/(^|\s)gn($|\s)|good\s*night|සුභ.*රාත්|සුභ\s*රෑ/.test(t)) replyText = "GOOD NIGHT සහෝදරයා 😊";
@@ -412,6 +426,39 @@
       const chatBody = document.getElementById("chatBody");
       const chatForm = document.getElementById("chatForm");
       const chatText = document.getElementById("chatText");
+      
+      const STORAGE_KEY = 'danaOfficialChatHistory';
+      const EXPIRY_HOURS = 24;
+
+      function saveChat() {
+        const chatData = { html: chatBody.innerHTML, timestamp: Date.now() };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(chatData));
+      }
+
+      function clearChat() {
+        localStorage.removeItem(STORAGE_KEY);
+        chatBody.innerHTML = '';
+      }
+
+      function loadChat() {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+          try {
+            const chatData = JSON.parse(savedData);
+            const now = Date.now();
+            const expiryLimit = EXPIRY_HOURS * 60 * 60 * 1000;
+            const age = now - chatData.timestamp;
+
+            if (age < expiryLimit) {
+              chatBody.innerHTML = chatData.html;
+              chatBody.scrollTop = chatBody.scrollHeight;
+            } else { clearChat(); }
+          } catch (e) {
+            console.error("Could not load chat history:", e);
+            clearChat();
+          }
+        }
+      }
 
       function addUserMsg(content){
         const div = document.createElement("div");
@@ -419,6 +466,7 @@
         div.textContent = content;
         chatBody.appendChild(div);
         chatBody.scrollTop = chatBody.scrollHeight;
+        saveChat();
       }
       
       function addBotMsg(replyObject){
@@ -426,13 +474,11 @@
         div.className = "msg ai";
         div.innerHTML = replyObject.content;
         
-        // NEW: Add highlight class if it's a single bank reply
-        if (replyObject.type === 'single_bank') {
-            div.classList.add('highlight-bank');
-        }
+        if (replyObject.type === 'single_bank') { div.classList.add('highlight-bank'); }
         
         chatBody.appendChild(div);
         chatBody.scrollTop = chatBody.scrollHeight;
+        saveChat();
       }
 
       chatForm.addEventListener("submit", (e)=>{
@@ -458,11 +504,12 @@
                       button.innerHTML = SVG_COPY;
                       button.disabled = false;
                   }, 1500);
-              }).catch(err => {
-                  console.error('Failed to copy: ', err);
-              });
+              }).catch(err => { console.error('Failed to copy: ', err); });
           }
       });
+      
+      loadChat();
+
     })();
 
     /* ==== Layout: chat-body height ==== */
